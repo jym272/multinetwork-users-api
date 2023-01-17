@@ -1,3 +1,3 @@
-export * from './db';
+export * from './user';
 export * from './home';
 export * from './utils';

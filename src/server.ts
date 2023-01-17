@@ -1,6 +1,5 @@
 import { initializeSetup, startSetup } from './setup';
 import { getEnvOrFail, successConnectionMsg } from '@utils/index';
-import serverless from 'serverless-http';
 
 const { server } = initializeSetup();
 
@@ -18,5 +17,3 @@ void (async () => {
     process.exitCode = 1;
   }
 })();
-
-export const express = serverless(server);

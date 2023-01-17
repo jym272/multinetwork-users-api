@@ -1,8 +1,8 @@
 import { DataTypes, Sequelize } from 'sequelize';
-import { Person } from '@db/models';
+import { User } from '@db/models';
 
 export const init = (sequelize: Sequelize) => {
-  Person.init(
+  User.init(
     {
       id: {
         type: DataTypes.INTEGER,
@@ -11,23 +11,16 @@ export const init = (sequelize: Sequelize) => {
         autoIncrement: true,
         field: 'id'
       },
-      name: {
+      email: {
         type: DataTypes.STRING(64),
         allowNull: false,
         unique: true,
-        field: 'name'
-      },
-      age: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        field: 'age'
+        field: 'email'
       }
     },
     {
       sequelize,
-      tableName: 'person'
+      tableName: 'user'
     }
   );
 };
-
-export default Person;

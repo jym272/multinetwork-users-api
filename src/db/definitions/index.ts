@@ -1,8 +1,8 @@
 import { Sequelize } from 'sequelize';
 
-import * as person from '@db/definitions/Person';
+import * as user from '@db/definitions/User';
 
-const appLabels = [person];
+const appLabels = [user];
 
 export const initDefinitions = (sequelize: Sequelize) => {
   for (const label of appLabels) {
