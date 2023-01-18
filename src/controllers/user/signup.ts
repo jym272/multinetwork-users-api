@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { cleanEmail, controllerErrorWithMessage, isValidEmail, isValidPassword } from '@utils/index';
+import { authApiUrl, cleanEmail, controllerErrorWithMessage, isValidEmail, isValidPassword } from '@utils/index';
 import { getSequelizeClient } from '@db/sequelize';
 import { AccessType } from '@custom-types/index';
 import { User } from '@db/models';
@@ -29,7 +29,7 @@ export const signupController = () => {
 
     let response;
     try {
-      response = await axios.post('http://localhost:3051/hashed-password', {
+      response = await axios.post(`${authApiUrl}/hashed-password`, {
         password,
         email
       });

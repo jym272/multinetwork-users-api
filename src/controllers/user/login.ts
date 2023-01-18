@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { cleanEmail, controllerErrorWithMessage, isValidEmail, isValidPassword } from '@utils/index';
+import { authApiUrl, cleanEmail, controllerErrorWithMessage, isValidEmail, isValidPassword } from '@utils/index';
 import { AccessType } from '@custom-types/index';
 import { User } from '@db/models';
 import axios from 'axios';
@@ -27,7 +27,7 @@ export const loginController = () => {
 
     let response;
     try {
-      response = await axios.post('http://localhost:3051/update-token', {
+      response = await axios.post(`${authApiUrl}/update-token`, {
         password,
         email
       });
