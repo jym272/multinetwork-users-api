@@ -18,11 +18,11 @@ export const loginController = () => {
       }
     });
     if (!user) {
-      return res.status(400).json({ message: 'Email does not exist.' });
+      return res.status(401).json({ message: 'Email does not exist.' });
     }
 
     if (!isValidPassword(password)) {
-      return res.status(400).json({ message: 'Invalid password.' });
+      return res.status(401).json({ message: 'Invalid password.' });
     }
 
     let response;
