@@ -49,5 +49,4 @@ export COMPOSE_PROJECT_NAME=users-api-test
 docker compose -f "$dir"/docker-compose.test.yml up -d
 
 bash "$dir"/test --build
-
-#docker compose -f "$dir"/docker-compose.test.yml down -v
+bash "$dir"/down-test-container.sh
