@@ -1,0 +1,94 @@
+name: Run tests
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+    paths:
+      - "src/**"
+      - "tests/**"
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Load cached dependencies and run commands
+        uses: ./.github/actions/cache-deps
+        with:
+          run-commands: |
+            npm ci
+            npm run lint
+  build-api-for-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Load cached dependencies and run commands
+        uses: ./.github/actions/cache-deps
+        with:
+          run-commands: |
+            npm ci --omit=dev
+            npm run build
+            cp -rf .git/ dist/
+            touch dist/.nojekyll
+      - name: Upload Artifact - Build dist folder
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist
+  test-api:
+    needs: build-api-for-test
+    runs-on: ubuntu-latest
+    environment: testing
+    env:
+      PORT: 3050
+      POSTGRES_USER: jorge
+      POSTGRES_DB: users
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5234
+      AUTH_API_HOST: localhost
+      AUTH_API_PORT: 3051
+    outputs:
+      tests-failed: ${{ steps.running-tests.outputs.tests-failed }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Download artifact - Build dist folder
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist
+      - run: docker compose -f scripts/docker-compose.test.yml pull
+      - uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
+      - name: Load cached dependencies and run commands
+        uses: ./.github/actions/cache-deps
+        id: running-tests
+        with:
+          running-test: true
+          report-name: report
+          run-commands: |
+            npm ci --omit=dev
+            docker compose -f ./scripts/docker-compose.test.yml up -d
+            bash scripts/test
+  report:
+    needs: [test-api]
+    if: ${{ failure() && needs.test-api.outputs.tests-failed == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - if: ${{ needs.test-api.outputs.tests-failed == 'true' }}
+        name: Download report
+        uses: actions/download-artifact@v3
+        with:
+          name: report
+          path: playwright-report
+      - if: ${{ needs.test-api.outputs.tests-failed == 'true' }}
+        name: Show report
+        run: |
+          ls -la
+          ls -la playwright-report
+          cat playwright-report/test-results.json | jq
